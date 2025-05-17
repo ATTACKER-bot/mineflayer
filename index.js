@@ -1,5 +1,16 @@
 // index.js
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+  res.send('✅ Bot ishlayapti!');
+});
+app.listen(port, () => {
+  console.log(`🌐 Web server ${port}-portda ishlayapti`);
+});
+
+// === Bot qismi ===
 const mineflayer = require("mineflayer");
 
 const bot = mineflayer.createBot({
@@ -39,7 +50,6 @@ bot.once("spawn", () => {
   }, 5000);
 });
 
-// Kavlash funksiyasi
 async function dig() {
   try {
     if (!bot.heldItem || !bot.heldItem.name.includes("pickaxe")) {
@@ -61,7 +71,6 @@ async function dig() {
   }
 }
 
-// O'lganida avtomatik qaytish
 bot.on("death", () => {
   console.log("☠️ Bot o‘ldi, /back yozilmoqda...");
   setTimeout(() => {
@@ -69,7 +78,6 @@ bot.on("death", () => {
   }, 3000);
 });
 
-// Ulanishdan chiqqanda qayta urinish
 bot.on("end", () => {
   console.log("⚠️ Bot serverdan chiqdi. Qayta ulanmoqda...");
   setTimeout(() => {
@@ -77,7 +85,6 @@ bot.on("end", () => {
   }, 5000);
 });
 
-// Xatolikni ko‘rsatish
 bot.on("error", (err) => {
   console.log("❌ Xatolik:", err.message);
 });
