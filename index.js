@@ -1,99 +1,83 @@
-const express = require('express');
-const mineflayer = require('mineflayer');
+// index.js
 
-const app = express();
-let bot;
+const mineflayer = require("mineflayer");
 
-const config = {
-  host: 'hypixel.uz',
+const bot = mineflayer.createBot({
+  host: "ir.skyblock.uz",
   port: 25566,
-  version: '1.12',
-  username: 'AT_nether_bot1',
-  password: 'abdu2006',
-  loginPassword: '82782782',
-};
+  version: "1.12",
+  username: "AT_nether_bot1",
+});
 
-function startBot() {
-  bot = mineflayer.createBot({
-    host: config.host,
-    port: config.port,
-    version: config.version,
-    username: config.username,
-  });
+const password = "abdu2006";
+const loginPassword = "82782782";
 
-  bot.on('messagestr', (message) => {
-    console.log(message);
+bot.on("messagestr", (message) => {
+  console.log(message);
 
-    if (message.includes('/register')) {
-      bot.chat(`/register ${config.password} ${config.password}`);
-    }
-
-    if (message.includes('/login')) {
-      bot.chat(`/login ${config.loginPassword}`);
-    }
-  });
-
-  bot.on('spawn', () => {
-    console.log('✅ Bot spawn bo‘ldi!');
-
-    // 5s kutib warp qiladi
-    setTimeout(() => {
-      bot.chat('/is warp mine1');
-      console.log('📦 /is warp farm komandasi yuborildi');
-
-      // 5s kutib qazishni boshlaydi
-      setTimeout(() => {
-        dig();
-      }, 5000);
-    }, 5000);
-  });
-
-  // Kavlash funksiyasi
-  async function dig() {
-    try {
-      if (!bot.heldItem || !bot.heldItem.name.includes("pickaxe")) {
-        const pickaxe = bot.inventory.items().find(i => i.name.includes("pickaxe"));
-        if (pickaxe) await bot.equip(pickaxe, "hand");
-        else return bot.quit();
-      }
-
-      const block = bot.blockAtCursor(6);
-      if (!block) return setTimeout(dig, 200);
-
-      await bot.dig(block);
-      dig(); // rekursiv davom ettiradi
-    } catch (err) {
-      console.log("⛏️ Kavlashda xatolik:", err.message);
-      setTimeout(dig, 500);
-    }
+  if (message.includes("/register")) {
+    bot.chat(`/register ${password} ${password}`);
   }
 
-  // o‘lganda /back yozadi
-  bot.on('death', () => {
-    console.log('☠️ Bot o‘ldi. /back yozilmoqda...');
+  if (message.includes("/login")) {
+    bot.chat(`/login ${loginPassword}`);
+  }
+});
+
+bot.once("spawn", () => {
+  console.log("✅ Bot muvaffaqiyatli spawn bo‘ldi!");
+
+  // 5 soniya kutib /is warp mine1 ni yozadi
+  setTimeout(() => {
+    bot.chat("/is warp mine1");
+    console.log("📦 /is warp mine1 komandasi yuborildi");
+
+    // 5 sekunddan keyin kavlashni boshlaydi
     setTimeout(() => {
-      bot.chat('/back');
-    }, 3000);
-  });
+      dig();
+    }, 5000);
+  }, 5000);
+});
 
-  // serverdan chiqsa qayta ulanadi
-  bot.on('end', () => {
-    console.log('⚠️ Bot serverdan chiqdi. Qayta ulanmoqda...');
-    setTimeout(startBot, 5000);
-  });
+// Kavlash funksiyasi
+async function dig() {
+  try {
+    if (!bot.heldItem || !bot.heldItem.name.includes("pickaxe")) {
+      const pickaxe = bot.inventory.items().find(i => i.name.includes("pickaxe"));
+      if (pickaxe) await bot.equip(pickaxe, "hand");
+      else return bot.quit();
+    }
 
-  bot.on('error', err => {
-    console.log('❌ Bot xatolik berdi:', err.message);
-  });
+    const block = bot.blockAtCursor(6);
+    if (!block) {
+      return setTimeout(dig, 200);
+    }
+
+    await bot.dig(block);
+    dig();
+  } catch (err) {
+    console.log("⛏️ Kavlashda xatolik:", err.message);
+    setTimeout(dig, 500);
+  }
 }
 
-// Botni ishga tushuramiz
-startBot();
-
-// UptimeRobot uchun mini web-server
-app.get('/', (req, res) => {
-  res.send('✅ Bot ishlayapti!');
+// O'lganida avtomatik qaytish
+bot.on("death", () => {
+  console.log("☠️ Bot o‘ldi, /back yozilmoqda...");
+  setTimeout(() => {
+    bot.chat("/back");
+  }, 3000);
 });
-app.listen(3000, () => {
-  console.log('🌐 Web server ishga tushdi (port 3000)');
+
+// Ulanishdan chiqqanda qayta urinish
+bot.on("end", () => {
+  console.log("⚠️ Bot serverdan chiqdi. Qayta ulanmoqda...");
+  setTimeout(() => {
+    process.exit(1); // Render qayta ishga tushiradi
+  }, 5000);
+});
+
+// Xatolikni ko‘rsatish
+bot.on("error", (err) => {
+  console.log("❌ Xatolik:", err.message);
 });
