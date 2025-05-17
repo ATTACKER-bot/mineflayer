@@ -6,11 +6,11 @@ const bot = mineflayer.createBot({
   host: "ir.skyblock.uz",
   port: 25566,
   version: "1.12",
-  username: "AT_nether_bot1",
+  username: "AT_nether_bot3",
 });
 
 const password = "abdu2006";
-const loginPassword = "82782782";
+const loginPassword = "84784784";
 
 bot.on("messagestr", (message) => {
   console.log(message);
