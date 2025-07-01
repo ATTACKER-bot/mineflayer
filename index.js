@@ -10,7 +10,7 @@ const config = {
   version: '1.12',
   username: 'AT_nether_bot1',
   password: 'abdu2006',
-  loginPassword: '82782782',
+  loginPassword: '',
 };
 
 function startBot() {
